@@ -11,6 +11,7 @@
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_panel_ops.h>
 #include <esp_lcd_panel_vendor.h>
+#include <esp_lcd_ili9488.h>
 
 #include "freertos/semphr.h"
 #include <freertos/FreeRTOS.h>
@@ -170,11 +171,12 @@ static void esp_lcd_init(void* _ignored)
 #ifdef CONFIG_DCS_ADDRESS_MODE_BGR_SELECTED
         .rgb_endian = LCD_RGB_ENDIAN_BGR,
 #endif
-        .bits_per_pixel = 16,
+        .bits_per_pixel = 18,
     };
 #endif // else CONFIG_PIN_NUM_DATA0
 
-    ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(io_handle, &panel_config, &ph));
+    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9488(io_handle, &panel_config, CONFIG_DISPLAY_WIDTH * 25, &ph));
+    //ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(io_handle, &panel_config, &ph));
 
 #if CONFIG_DISPLAY_PIN_BL != -1
     ESP_ERROR_CHECK(gpio_set_level(CONFIG_DISPLAY_PIN_BL, 1));

@@ -1,4 +1,5 @@
 dependencies:
+  atanisoft/esp_lcd_ili9488: "~1.0.0"
   espressif/button: "==3.4.0"
   espressif/nghttp: "==1.62.1"
   espressif/cbor: "==0.6.0~1"

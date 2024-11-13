@@ -153,9 +153,9 @@ static void boot_process(void)
         JADE_ABORT();
     }
 
-#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
-    esp_log_set_vprintf(serial_logger);
-#endif
+//#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
+//    esp_log_set_vprintf(serial_logger);
+//#endif
 
     const esp_err_t rc = power_init();
     JADE_ASSERT(rc == ESP_OK);
