@@ -1,0 +1,81 @@
+name: Build T-Deck
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        variant:
+          - { name: tdeck, config: sdkconfig_display_tdeck.defaults }
+          - { name: tdeck-debug, config: sdkconfig_display_tdeck_debug.defaults }
+    runs-on: ubuntu-latest
+    container: espressif/idf:v5.5.4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          # Full history + tags so git describe produces a parseable
+          # firmware version (companion apps reject e.g. "1")
+          fetch-depth: 0
+
+      - name: Build ${{ matrix.variant.name }} firmware
+        shell: bash
+        run: |
+          . /opt/esp/idf/export.sh
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          echo "Firmware version: $(git describe --tags --always --dirty)"
+          cp configs/${{ matrix.variant.config }} sdkconfig.defaults
+          idf.py -B build_${{ matrix.variant.name }} set-target esp32s3
+          idf.py -B build_${{ matrix.variant.name }} build
+
+      - name: Stage firmware artifacts
+        run: |
+          mkdir -p firmware-${{ matrix.variant.name }}/bootloader firmware-${{ matrix.variant.name }}/partition_table
+          cp build_${{ matrix.variant.name }}/bootloader/bootloader.bin firmware-${{ matrix.variant.name }}/bootloader/
+          cp build_${{ matrix.variant.name }}/partition_table/partition-table.bin firmware-${{ matrix.variant.name }}/partition_table/
+          cp build_${{ matrix.variant.name }}/ota_data_initial.bin firmware-${{ matrix.variant.name }}/ 2>/dev/null || true
+          cp build_${{ matrix.variant.name }}/jade.bin firmware-${{ matrix.variant.name }}/ 2>/dev/null || true
+          cp build_${{ matrix.variant.name }}/flasher_args.json firmware-${{ matrix.variant.name }}/ 2>/dev/null || true
+          echo "Firmware staged:"
+          find firmware-${{ matrix.variant.name }} -type f | sort
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.variant.name }}
+          path: firmware-${{ matrix.variant.name }}/
+          retention-days: 90
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download normal firmware artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-tdeck
+          path: flasher/firmware/tdeck/
+
+      - name: Download debug firmware artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-tdeck-debug
+          path: flasher/firmware/tdeck-debug/
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: flasher/
+          destination_dir: .
+          keep_files: false

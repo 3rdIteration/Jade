@@ -1703,7 +1703,7 @@ static void handle_view_otps(void)
 
 // NOTE: Only Jade v1.1's and v2's have brightness controls
 #if defined(CONFIG_BOARD_TYPE_JADE_V1_1) || defined(CONFIG_BOARD_TYPE_JADE_V2_ANY)                                     \
-    || defined(CONFIG_BOARD_TYPE_WS_TOUCH_LCD2)
+    || defined(CONFIG_BOARD_TYPE_WS_TOUCH_LCD2) || defined(CONFIG_BOARD_TYPE_TDECK)
 static void handle_screen_brightness(void)
 {
     static const char* LABELS[] = { "Min(1)", "Low(2)", "Medium(3)", "High(4)", "Max(5)" };
@@ -2039,7 +2039,7 @@ static void handle_display_battery_volts(void)
 #ifdef CONFIG_HAS_AXP
     const int ret = snprintf(power_status, sizeof(power_status), "%umv", power_get_vbat());
     JADE_ASSERT(ret > 0 && ret < sizeof(power_status));
-#elif defined(CONFIG_BOARD_TYPE_M5_STICKC_PLUS_2)
+#elif defined(CONFIG_BOARD_TYPE_M5_STICKC_PLUS_2) || defined(CONFIG_BOARD_TYPE_TDECK)
     const uint16_t vbat = power_get_vbat();
     if (vbat > 0) {
         const int ret = snprintf(power_status, sizeof(power_status), "%umv", vbat);
@@ -2281,7 +2281,7 @@ static void handle_settings(const bool startup_menu)
 
 // NOTE: Only Jade v1.1's and v2's have brightness controls
 #if defined(CONFIG_BOARD_TYPE_JADE_V1_1) || defined(CONFIG_BOARD_TYPE_JADE_V2_ANY)                                     \
-    || defined(CONFIG_BOARD_TYPE_WS_TOUCH_LCD2)
+    || defined(CONFIG_BOARD_TYPE_WS_TOUCH_LCD2) || defined(CONFIG_BOARD_TYPE_TDECK)
         case BTN_SETTINGS_DISPLAY_BRIGHTNESS:
             handle_screen_brightness();
             break;
