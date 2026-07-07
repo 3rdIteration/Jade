@@ -514,7 +514,7 @@ menu "Blockstream Jade"
             default 135
         config DCS_ADDRESS_MODE_BGR_SELECTED
             bool "BGR"
-            default y if BOARD_TYPE_M5_FIRE || BOARD_TYPE_M5_BLACK_GRAY || BOARD_TYPE_M5_CORES3 || BOARD_TYPE_M5_CORE2 || BOARD_TYPE_TTGO_TDISPLAYS3PROCAMERA || BOARD_TYPE_TDECK
+            default y if BOARD_TYPE_M5_FIRE || BOARD_TYPE_M5_BLACK_GRAY || BOARD_TYPE_M5_CORES3 || BOARD_TYPE_M5_CORE2 || BOARD_TYPE_TTGO_TDISPLAYS3PROCAMERA
         config DCS_ADDRESS_MODE_MIRROR_X_SELECTED
             bool "Mirror X"
             default y if BOARD_TYPE_JADE_ANY || \
